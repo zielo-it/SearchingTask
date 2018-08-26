@@ -22,6 +22,8 @@ namespace SolidBrainTask
 
             searchBar = driver.FindElement(By.Id("search"));
 
+            Thread.Sleep(1000);
+
             searchBar.SendKeys(Phrase);
             searchBar.SendKeys(Keys.Enter);
 
