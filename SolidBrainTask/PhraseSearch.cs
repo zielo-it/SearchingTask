@@ -24,10 +24,7 @@ namespace SolidBrainTask
 
             webDriverWait.Until(ExpectedConditions.ElementIsVisible(By.Id("search")));
 
-            searchBar = driver.FindElement(By.Id("search"));
-
-            searchBar.SendKeys(Phrase);
-            searchBar.SendKeys(Keys.Enter);
+            PhraseSending();
 
             webDriverWait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("OneABBSearchList-item")));
 
@@ -51,6 +48,13 @@ namespace SolidBrainTask
         private void ClickSearchIcon()
         {
             driver.FindElement(By.ClassName("abb-icon__search")).Click();
+        }
+
+        private void PhraseSending()
+        {
+            searchBar = driver.FindElement(By.Id("search"));
+            searchBar.SendKeys(Phrase);
+            searchBar.SendKeys(Keys.Enter);
         }
 
         private bool FindPhraseInItem(IWebElement item)
