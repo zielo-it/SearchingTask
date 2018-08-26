@@ -1,6 +1,7 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using System.Threading;
+using OpenQA.Selenium.Support.UI;
+using System;
 
 namespace SolidBrainTask
 {
@@ -15,19 +16,20 @@ namespace SolidBrainTask
         {
             string url = "https://new.abb.com";
             driver.Navigate().GoToUrl(url);
-            
-            Thread.Sleep(1000);
+
+            var webDriverWait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+            webDriverWait.Until(ExpectedConditions.ElementExists(By.Id("PublicWrapper")));
 
             ClickSearchIcon();
 
-            searchBar = driver.FindElement(By.Id("search"));
+            webDriverWait.Until(ExpectedConditions.ElementIsVisible(By.Id("search")));
 
-            Thread.Sleep(1000);
+            searchBar = driver.FindElement(By.Id("search"));
 
             searchBar.SendKeys(Phrase);
             searchBar.SendKeys(Keys.Enter);
 
-            Thread.Sleep(3000);
+            webDriverWait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("OneABBSearchList-item")));
 
             var items = driver.FindElements(By.ClassName("OneABBSearchList-item"));
             bool result = false;
