@@ -1,80 +1,71 @@
-﻿using OpenQA.Selenium;
+﻿using System;
+using System.Collections.ObjectModel;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
-using System;
+using SeleniumExtras.WaitHelpers;
 
 namespace SolidBrainTask
 {
     public class PhraseSearch
     {
-        static IWebDriver driver = new ChromeDriver();
-        static IWebElement searchBar;
+        private readonly IWebDriver _driver = new ChromeDriver();
 
-        public string Phrase { get; set; }
-        
-        public bool Search()
+        public bool Search(string phrase)
         {
-            string url = "https://new.abb.com";
-            driver.Navigate().GoToUrl(url);
+            const string url = "https://new.abb.com";
+            _driver.Navigate().GoToUrl(url);
 
-            var webDriverWait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+            var webDriverWait = new WebDriverWait(_driver, TimeSpan.FromSeconds(5));
             webDriverWait.Until(ExpectedConditions.ElementExists(By.Id("PublicWrapper")));
 
             ClickSearchIcon();
 
             webDriverWait.Until(ExpectedConditions.ElementIsVisible(By.Id("search")));
 
-            PhraseSending();
+            PhraseSending(phrase);
 
             webDriverWait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("OneABBSearchList-item")));
 
-            var items = driver.FindElements(By.ClassName("OneABBSearchList-item"));
-            bool result = false;
+            var result = IsPhraseProperlySearched(phrase, _driver.FindElements(By.ClassName("OneABBSearchList-item")));
 
-            for(var i = 0; i < 3; i++)
-            {
-                result = FindPhraseInItem(items[i]);
+            _driver.Quit();
 
-                if(!result)
-                {
-                    break;
-                }
-            }
-            
-            driver.Quit();
             return result;
+        }
+
+        private bool IsPhraseProperlySearched(string phrase, ReadOnlyCollection<IWebElement> items)
+        {
+            for (var i = 0; i < 3; i++)
+                if (!FindPhraseInItem(items[i], phrase))
+                    return false;
+
+            return true;
         }
 
         private void ClickSearchIcon()
         {
-            driver.FindElement(By.ClassName("abb-icon__search")).Click();
+            _driver.FindElement(By.ClassName("abb-icon__search")).Click();
         }
 
-        private void PhraseSending()
+        private void PhraseSending(string phrase)
         {
-            searchBar = driver.FindElement(By.Id("search"));
-            searchBar.SendKeys(Phrase);
+            var searchBar = _driver.FindElement(By.Id("search"));
+            searchBar.SendKeys(phrase);
             searchBar.SendKeys(Keys.Enter);
         }
 
-        private bool FindPhraseInItem(IWebElement item)
+        private bool FindPhraseInItem(ISearchContext item, string phrase)
         {
             var headingElement = item.FindElement(By.ClassName("OneABBSearchList-item-heading"));
 
-            if (headingElement.Text.ToLower().Contains(Phrase.ToLower()))
-            {
-                return true;
-            }
+            if (headingElement.Text.ToLower().Contains(phrase.ToLower())) return true;
 
             var paragraphElements = item.FindElements(By.ClassName("OneABBSearchList-item-paragraph"));
 
-            foreach(var paragraphElement in paragraphElements)
-            {
-                if (paragraphElement.Text.ToLower().Contains(Phrase.ToLower()))
-                {
+            foreach (var paragraphElement in paragraphElements)
+                if (paragraphElement.Text.ToLower().Contains(phrase.ToLower()))
                     return true;
-                }
-            }
             return false;
         }
     }
