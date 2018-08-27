@@ -3,12 +3,14 @@
 namespace SolidBrainTask
 {
     [TestFixture]
+    [Category("Functional")]
     internal class FunctionalTests
     {
         [Test]
-        public void SearchTest()
+        [TestCase("Yumi")]
+        public void SearchTest(string searchPhrase)
         {
-            Assert.IsTrue(new PhraseSearch().Search("Yumi"), "Search is not working properly.");
+            Assert.IsTrue(new PhraseSearch().Search(searchPhrase), "Search is not working properly.");
         }
     }
 }

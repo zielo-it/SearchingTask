@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
@@ -34,7 +34,7 @@ namespace SolidBrainTask
             return result;
         }
 
-        private bool IsPhraseProperlySearched(string phrase, ReadOnlyCollection<IWebElement> items)
+        private bool IsPhraseProperlySearched(string phrase, IReadOnlyList<IWebElement> items)
         {
             for (var i = 0; i < 3; i++)
                 if (!FindPhraseInItem(items[i], phrase))
@@ -66,6 +66,7 @@ namespace SolidBrainTask
             foreach (var paragraphElement in paragraphElements)
                 if (paragraphElement.Text.ToLower().Contains(phrase.ToLower()))
                     return true;
+
             return false;
         }
     }
